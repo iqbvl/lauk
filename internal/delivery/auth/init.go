@@ -13,6 +13,7 @@ const (
 	invalidEmailFormat      = "You are inputting wrong email address format"
 	emptyLoginField         = "Username and Password cant be empty"
 	postMethodSupported     = "Only Post Allowed"
+	getMethodSupported      = "Only GET Allowed"
 	errorConvertRequestBody = "Error when converting request body"
 	tokenError              = "Error Generate Token"
 )

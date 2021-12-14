@@ -31,7 +31,7 @@ func (d *REST) RegisterRoute(r *chi.Mux) {
 	//public
 	r.Group(func(r chi.Router) {
 		r.Post("/generate", d.GeneratePasswordHandler)
-		// r.Post("/register", RegisterHandler)
+		r.Post("/getjwt", d.GetJWTHandler)
 		// r.Post("/forgotpassword", ForgotPasswordHandler)
 		// r.Post("/sendotp", SendOTPHandler)
 	})
@@ -40,6 +40,6 @@ func (d *REST) RegisterRoute(r *chi.Mux) {
 	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(d.TokenJWT))
 		r.Use(jwtauth.Authenticator)
-		//r.Get("/dashboard", DashboardHandler)
+		r.Get("/validatejwt", d.ValidateJWTHandler)
 	})
 }

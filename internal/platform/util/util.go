@@ -57,7 +57,7 @@ func ParseInt64(value string) int64 {
 }
 
 func GenerateKey(in model.User) string {
-	return fmt.Sprintf("%s:%s", in.Role, in.Phone)
+	return fmt.Sprintf("%s", in.Phone)
 }
 
 func UserRequestBodyDecoder(req *http.Request) (model.User, error) {
@@ -71,6 +71,18 @@ func UserRequestBodyDecoder(req *http.Request) (model.User, error) {
 	if t.Name == "" || t.Phone == "" || t.Role == "" {
 		return model.User{}, errors.New("invalid request")
 	}
+	defer req.Body.Close()
+	return t, nil
+}
+
+func UserGetJWTRequestBodyDecoder(req *http.Request) (model.User, error) {
+	var t model.User = model.User{}
+	decoder := json.NewDecoder(req.Body)
+	err := decoder.Decode(&t)
+	if err != nil {
+		return t, err
+	}
+
 	defer req.Body.Close()
 	return t, nil
 }

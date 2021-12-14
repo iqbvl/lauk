@@ -34,7 +34,6 @@ func init() {
 
 	ctx = context.Background()
 	authDelivery = auth.NewREST(auth.REST{Context: ctx, AuthUsecase: authUsecase, TokenJWT: TokenAuth})
-
 }
 
 func main() {
