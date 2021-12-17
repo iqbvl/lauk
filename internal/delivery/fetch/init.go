@@ -1,4 +1,4 @@
-package auth
+package fetch
 
 import (
 	"context"
@@ -20,15 +20,15 @@ const (
 )
 
 type REST struct {
-	Context     context.Context
-	AuthUsecase usecase.Auth
-	TokenJWT    *jwtauth.JWTAuth
+	Context      context.Context
+	FetchUsecase usecase.Fetch
+	TokenJWT     *jwtauth.JWTAuth
 }
 
-func NewREST(args REST) delivery.Auth {
+func NewREST(args REST) delivery.Fetch {
 	return &REST{
-		AuthUsecase: args.AuthUsecase,
-		TokenJWT:    args.TokenJWT,
-		Context:     args.Context,
+		FetchUsecase: args.FetchUsecase,
+		TokenJWT:     args.TokenJWT,
+		Context:      args.Context,
 	}
 }

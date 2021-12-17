@@ -1,4 +1,4 @@
-package auth
+package fetch
 
 import (
 	"time"
@@ -28,16 +28,11 @@ func (d *REST) RegisterRoute(r *chi.Mux) {
 	r.Use(cors.Handler)
 	r.Use(chimiddleware.Timeout(60 * time.Second))
 
-	//public
-	r.Group(func(r chi.Router) {
-		r.Post("/generate", d.GeneratePasswordHandler)
-		r.Post("/getjwt", d.GetJWTHandler) 
-	})
-
 	//protected
 	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(d.TokenJWT))
 		r.Use(jwtauth.Authenticator)
+		r.Get("/get", d.GetStorageHandler)
 		r.Get("/validatejwt", d.ValidateJWTHandler)
 	})
 }

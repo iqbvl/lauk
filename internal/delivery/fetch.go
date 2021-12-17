@@ -1,9 +1,9 @@
-package auth
+package delivery
 
 import (
 	"github.com/go-chi/chi"
 )
 
-type Delivery interface {
+type Fetch interface {
 	RegisterRoute(r *chi.Mux)
 }

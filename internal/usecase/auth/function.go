@@ -11,10 +11,10 @@ import (
 func (u *AuthUsecase) GetUser(ctx context.Context, args model.User) (model.User, error) {
 	user, err := u.TTLCache.GetUser(ctx, util.GenerateKey(args))
 	if err != nil {
-		if err.Error() != "key not found" {
+		if err.Error() != model.KeyNotFound {
 			log.Errorf("[AuthUsecase][u.TTLCache.GetUser] msg : %s \n", err.Error())
 			return user, err
-		} 
+		}
 	}
 	return user, nil
 }

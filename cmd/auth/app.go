@@ -7,31 +7,36 @@ import (
 	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/jwtauth"
+	"github.com/iqbvl/lauk/internal/delivery"
 	"github.com/iqbvl/lauk/internal/delivery/auth"
-	rAuth "github.com/iqbvl/lauk/internal/repository/auth"
-	rAuthTTLCache "github.com/iqbvl/lauk/internal/repository/auth/ttlcache"
+	"github.com/iqbvl/lauk/internal/repository"
+	rTTLCache "github.com/iqbvl/lauk/internal/repository/ttlcache"
 	"github.com/iqbvl/lauk/internal/usecase"
 	uAuth "github.com/iqbvl/lauk/internal/usecase/auth"
 	log "github.com/sirupsen/logrus"
 )
 
 var (
-	TokenAuth        *jwtauth.JWTAuth
-	authTTLCacheRepo rAuth.Cache
-	authUsecase      usecase.Auth
-	authDelivery     auth.Delivery
-	ctx              context.Context
+	TokenAuth    *jwtauth.JWTAuth
+	ttlCacheRepo repository.Cache
+	authUsecase  usecase.Auth
+	authDelivery delivery.Auth
+	ctx          context.Context
 )
 
 func init() {
-	authTTLCacheRepo = rAuthTTLCache.NewTTLCache(ttlcache.NewCache())
+	//init repo
+	ttlCacheRepo = rTTLCache.NewTTLCache(ttlcache.NewCache())
+
+	//init usecase
 	authUsecase = uAuth.NewUsecase(uAuth.AuthUsecase{
-		TTLCache: authTTLCacheRepo,
+		TTLCache: ttlCacheRepo,
 	})
 
 	secretKey := "aXFiYWwgYWJkdXJyYWhtYW4="
 	TokenAuth = jwtauth.New("HS256", []byte(secretKey), nil)
 
+	//init delivery
 	ctx = context.Background()
 	authDelivery = auth.NewREST(auth.REST{Context: ctx, AuthUsecase: authUsecase, TokenJWT: TokenAuth})
 }

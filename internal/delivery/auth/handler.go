@@ -3,7 +3,6 @@ package auth
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -107,12 +106,12 @@ func (d *REST) GetJWTHandler(w http.ResponseWriter, r *http.Request) {
 	expired := util.ParseDuration("P1Y")
 	tmstmp := time.Now().Format(`2006-01-02T15:04:05.000-07:00`)
 	_, tokenString, _ := d.TokenJWT.Encode(jwt.MapClaims{
-		"name":       respUser.Name,
-		"phone":      respUser.Phone,
-		"role":       respUser.Role,
-		"timestamp":  tmstmp,
-		"claim_date": tmstmp,
-		"expire":     expired,
+		Name:      respUser.Name,
+		Phone:     respUser.Phone,
+		Role:      respUser.Role,
+		Timestamp: tmstmp,
+		ClaimDate: tmstmp,
+		Expire:    expired,
 	})
 
 	ctx := context.WithValue(r.Context(), "TokenAuth", d.TokenJWT)
@@ -148,18 +147,14 @@ func (d *REST) ValidateJWTHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, claims, _ := jwtauth.FromContext(r.Context())
 
-	reqToken := r.Header.Get("Authorization")
-	splitToken := strings.Split(reqToken, "Bearer ")
-	reqToken = splitToken[1]
-
-	rsp.Token = reqToken
+	rsp.Token = util.GetToken(r)
 	rsp.Claims = JWTClaims{
-		Name:      claims["name"].(string),
-		Phone:     claims["phone"].(string),
-		Role:      claims["role"].(string),
-		Timestamp: claims["timestamp"].(string),
-		ClaimDate: claims["claim_date"].(string),
-		Expire:    time.Duration(claims["expire"].(float64)),
+		Name:      claims[Name].(string),
+		Phone:     claims[Phone].(string),
+		Role:      claims[Role].(string),
+		Timestamp: claims[Timestamp].(string),
+		ClaimDate: claims[ClaimDate].(string),
+		Expire:    time.Duration(claims[Expire].(float64)),
 	}
 	response, _ := json.Marshal(rsp)
 	w.Write(response)

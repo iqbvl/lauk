@@ -14,6 +14,10 @@ import (
 	"github.com/iqbvl/lauk/internal/model"
 )
 
+var (
+	loc, _ = time.LoadLocation("Asia/Jakarta")
+)
+
 func GeneratePassword() string {
 	rand.Seed(time.Now().UnixNano())
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
@@ -85,4 +89,31 @@ func UserGetJWTRequestBodyDecoder(req *http.Request) (model.User, error) {
 
 	defer req.Body.Close()
 	return t, nil
+}
+
+func GetToken(r *http.Request) string {
+	reqToken := r.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, "Bearer ")
+
+	return splitToken[1]
+}
+
+//GetRatesExpiryTime return time duration of remaining time from request happen until end of day
+func GetRatesExpiryTime() time.Duration {
+	now := time.Now().In(loc)
+	eod := now
+
+	nxt := eod.AddDate(0, 0, 1)
+	nxt = time.Date(nxt.Year(), nxt.Month(), nxt.Day(), 0, 0, 0, 0, loc)
+	return nxt.Sub(now)
+}
+
+func ParseDate(in string) (time.Time, error) {
+	t, err := time.Parse(time.RFC3339, in)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	result := t.In(loc)
+	return result, nil
 }

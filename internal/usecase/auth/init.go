@@ -1,9 +1,9 @@
 package auth
 
-import "github.com/iqbvl/lauk/internal/repository/auth"
+import "github.com/iqbvl/lauk/internal/repository"
 
 type AuthUsecase struct {
-	TTLCache auth.Cache
+	TTLCache repository.Cache
 }
 
 func NewUsecase(args AuthUsecase) *AuthUsecase{
