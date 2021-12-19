@@ -40,7 +40,7 @@ func (d *REST) ValidateJWTHandler(w http.ResponseWriter, r *http.Request) {
 
 func (d *REST) GetStorageHandler(w http.ResponseWriter, r *http.Request) {
 	var rsp []model.Storage
-	// var rspAdmin []model.StorageAdmin
+	mapProvince := make(map[string]map[int]model.StorageAgg)
 
 	var rates float64
 
@@ -67,15 +67,10 @@ func (d *REST) GetStorageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if role == model.Admin { 
-		mapProvince := make(map[string]string)
-		//mapProvinceWeek := make(map[string][]int) 
-		//mapProvinceWeekDays := make(map[int][]int) 
-
+	if role == model.Admin {
 		log.Printf("Total data : %d \n", len(rsp))
-		//var days []int
-		for _, v := range rsp {  
-			_, err := util.ParseDate(v.TglParsed)
+		for _, v := range rsp {
+			t, err := util.ParseDate(v.TglParsed)
 			if err != nil {
 				responses := &Response{
 					Data:          "",
@@ -83,13 +78,27 @@ func (d *REST) GetStorageHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				middleware.WriteResponse(w, responses, http.StatusInternalServerError)
 				return
-			}
-
-			if _, ok := mapProvince[v.AreaProvinsi]; !ok {
-				mapProvince[v.AreaProvinsi] = v.AreaProvinsi
 			} 
-		}
+
+			var ar []int
+			mapW := make(map[int]model.StorageAgg)
+			_, w := t.ISOWeek()
+			ar = append(ar, int(t.Weekday())) 
+			sA := model.StorageAgg{}
+			if _, ok := mapProvince[v.AreaProvinsi]; !ok { 
+				sA.TxnInAWeek = ar
+				mapW[w] = sA
+			} else { 
+				newArr := append(mapProvince[v.AreaProvinsi][w].TxnInAWeek, ar...)
+				sA.TxnInAWeek = newArr
+				mapW[w] = sA
+			}
  
+			mapProvince[v.AreaProvinsi] = util.FindFinalData(mapW) 
+		}
+		response, _ := json.Marshal(mapProvince)
+		w.Write(response)
+		return
 
 	}
 

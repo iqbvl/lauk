@@ -1,4 +1,4 @@
-package model 
+package model
 
 type Storage struct {
 	UUID         string `json:"uuid"`
@@ -15,6 +15,14 @@ type Storage struct {
 type StorageAdmin struct {
 	AreaProvinsi string           `json:"area_provinsi"`
 	Data         StorageAdminData `json:"data"`
+}
+
+type StorageAgg struct {
+	Avg        int   `json:"avg"`
+	Median     int   `json:"median"`
+	Min        int   `json:"min"`
+	Max        int   `json:"max"`
+	TxnInAWeek []int `json:"txn_in_a_week"`
 }
 
 type StorageAdminData struct {

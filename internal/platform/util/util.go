@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -116,4 +117,84 @@ func ParseDate(in string) (time.Time, error) {
 
 	result := t.In(loc)
 	return result, nil
+}
+
+func FindMinAndMax(a []int) (min int, max int) {
+
+	mapW := make(map[int]int)
+	for _, v := range a {
+		mapW[v] = mapW[v] + 1
+	} 
+
+	min = 0
+	max = 0
+
+	for _, value := range mapW {
+		if value < min {
+			min = value
+		}
+		if value > max {
+			max = value
+		}
+	}
+
+	if len(a) == 1 {
+		min = max
+	}
+
+	return min, max
+}
+
+func FindAvg(a []int) int {
+
+	var sum int
+	mapW := make(map[int]int)
+	for _, v := range a {
+		mapW[v] = mapW[v] + 1
+	}
+
+	for _, v := range mapW {
+		sum = sum + v
+	}
+
+	return sum / len(a)
+}
+
+func FindMedian(a []int) int {
+	mapW := make(map[int]int)
+	for _, v := range a {
+		mapW[v] = mapW[v] + 1
+	}
+
+	var tA []int
+	for _, v := range mapW {
+		tA = append(tA, v)
+	}
+	medianNum := len(tA) / 2
+	sort.Ints(tA)
+	if len(tA)%2 == 0 {
+		return (tA[medianNum-1] + tA[medianNum]) / 2
+	}
+
+	return tA[medianNum]
+}
+
+func FindFinalData(provinceData map[int]model.StorageAgg) map[int]model.StorageAgg {
+	res := make(map[int]model.StorageAgg)
+	for k, v := range provinceData {
+		min, max := FindMinAndMax(v.TxnInAWeek)
+		avg := FindAvg(v.TxnInAWeek)
+		median := FindMedian(v.TxnInAWeek)
+
+		d := model.StorageAgg{
+			Avg:        avg,
+			Median:     median,
+			Min:        min,
+			Max:        max,
+			TxnInAWeek: v.TxnInAWeek,
+		}
+		res[k] = d
+	}
+
+	return res
 }
